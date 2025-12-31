@@ -42,13 +42,6 @@ data/external/*
 *.dbf
 *.prj
 *.cpg
-*.gpkg
-*.geojson
-*.csv
-!data/raw/.gitkeep
-!data/processed/.gitkeep
-!data/external/.gitkeep
-
 # Models
 *.pkl
 *.h5
