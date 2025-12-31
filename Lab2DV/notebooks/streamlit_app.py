@@ -13,9 +13,13 @@ from folium.plugins import DualMap
 from streamlit_folium import st_folium
 
 import os
-# --- SOLUCIÓN PROJ (Agrégalo arriba de todo) ---
-os.environ['PROJ_LIB'] = '/opt/conda/share/proj'
-os.environ['PROJ_DATA'] = '/opt/conda/share/proj'
+# --- ESTO DEBE IR ANTES DE IMPORTAR GEOPANDAS O RASTERIO ---
+os.environ['PROJ_LIB'] = '/opt/conda/lib/python3.10/site-packages/pyproj/proj_dir/share/proj'
+os.environ['PROJ_DATA'] = '/opt/conda/lib/python3.10/site-packages/pyproj/proj_dir/share/proj'
+
+import streamlit as st
+import geopandas as gpd
+# ... resto de tus imports
 
 # -----------------------------
 # Config
