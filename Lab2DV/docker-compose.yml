@@ -14,7 +14,7 @@ services:
       - "${POSTGRES_PORT}:5432"
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -34,6 +34,7 @@ services:
       - ./data:/home/jovyan/data
       - ./scripts:/home/jovyan/scripts
       - ./outputs:/home/jovyan/outputs
+      - ./app:/home/jovyan/app
     ports:
       - "${JUPYTER_PORT}:8888"
     depends_on:
@@ -55,6 +56,32 @@ services:
       - postgis
     restart: unless-stopped
 
+  web:
+    build: ./docker/jupyter
+    container_name: streamlit_lab2
+    working_dir: /home/jovyan
+    user: root
+    command: >
+      bash -c "pip install --no-cache-dir streamlit leafmap localtileserver xarray rioxarray streamlit-folium geopandas &&
+               export PROJ_LIB=/opt/conda/share/proj &&
+               streamlit run work/streamlit_app.py --server.address=0.0.0.0 --server.port=8501"
+    environment:
+      - PROJ_LIB=/opt/conda/share/proj
+      - JUPYTER_TOKEN=${JUPYTER_TOKEN}
+      - POSTGRES_HOST=postgis
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - ./notebooks:/home/jovyan/work
+      - ./data:/home/jovyan/data
+      - ./outputs:/home/jovyan/outputs
+    ports:
+      - "8501:8501"
+    depends_on:
+      postgis:
+        condition: service_healthy
+    restart: unless-stopped
 volumes:
   postgres_data:
   pgadmin_data:
